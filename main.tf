@@ -59,7 +59,7 @@ resource "aws_placement_group" "default" {
 resource "aws_autoscaling_group" "default" {
   desired_capacity   = 1
   min_size           = 1
-  max_size           = 8
+  max_size           = 16
   health_check_type  = "EC2"
   mixed_instances_policy {
     launch_template {
