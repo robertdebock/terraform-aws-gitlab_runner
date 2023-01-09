@@ -12,6 +12,14 @@ echo "Install docker"
 yum -y install docker
 systemctl enable --now docker
 
+echo "Placing docker volume cleanup script"
+cat << EOF >> /etc/cron.hourly/docker-prune
+#!/bin/sh
+# Remove unused volumes to make diskspace available.
+docker system prune --force
+EOF
+chmod 755 /etc/cron.hourly/docker-prune
+
 echo "Instaling gitlab-runner"
 rpm -i "https://gitlab-runner-downloads.s3.amazonaws.com/latest/rpm/gitlab-runner_amd64.rpm"
 
