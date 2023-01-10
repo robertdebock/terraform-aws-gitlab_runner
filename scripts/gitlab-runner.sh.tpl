@@ -3,7 +3,7 @@
 echo "Mounting volume"
 mkfs.xfs /dev/sda1
 mkdir /var/lib/docker
-mount /dev/sda1 /var/lib/docker
+mount /dev/sda1 /var/lib/docker -o noatime
 
 echo "Installing prerequisites of GitLab"
 yum -y install git
