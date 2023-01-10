@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Mounting volume"
-mkfs /dev/sda1
+mkfs.xfs /dev/sda1
 mkdir /var/lib/docker
 mount /dev/sda1 /var/lib/docker
 
@@ -16,7 +16,7 @@ echo "Placing docker volume cleanup script"
 cat << EOF >> /etc/cron.hourly/docker-prune
 #!/bin/sh
 # Remove unused volumes to make diskspace available.
-docker system prune --force
+docker volume prune --force
 EOF
 chmod 755 /etc/cron.hourly/docker-prune
 
