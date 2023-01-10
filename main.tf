@@ -14,10 +14,10 @@ resource "aws_launch_template" "default" {
   block_device_mappings {
     device_name           = "/dev/sda1"
     ebs {
-      volume_size           = 256
+      volume_size           = 32
       delete_on_termination = true
-      volume_type           = "io1"
-      iops                  = 3200
+      volume_type           = "io2"
+      iops                  = 1600
     }
   }
   instance_requirements {
@@ -31,9 +31,6 @@ resource "aws_launch_template" "default" {
     instance_generations = ["current"]
   }
   key_name               = aws_key_pair.default.key_name
-  monitoring {
-    enabled = true
-  }
   name_prefix = "gitlab-runner-"
   network_interfaces {
     associate_public_ip_address = true
