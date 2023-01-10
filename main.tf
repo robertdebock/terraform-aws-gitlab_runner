@@ -14,7 +14,7 @@ resource "aws_launch_template" "default" {
   block_device_mappings {
     device_name           = "/dev/sda1"
     ebs {
-      volume_size           = 32
+      volume_size           = 64
       delete_on_termination = true
       volume_type           = "io2"
       iops                  = 1600
