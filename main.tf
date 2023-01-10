@@ -31,7 +31,10 @@ resource "aws_launch_template" "default" {
     instance_generations = ["current"]
   }
   key_name               = aws_key_pair.default.key_name
-  name_prefix            = "gitlab-runner-"
+  monitoring {
+    enabled = true
+  }
+  name_prefix = "gitlab-runner-"
   network_interfaces {
     associate_public_ip_address = true
     security_groups = [aws_security_group.public.id]
