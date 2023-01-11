@@ -38,7 +38,9 @@ gitlab-runner register --non-interactive \
   --locked="false" \
   --request-concurrency "${gitlab_runner_concurrency}"
 
+echo "Configuring gitlab-runner."
 sed -i "s/concurrent = .*/concurrent = ${gitlab_runner_concurrency}/" /etc/gitlab-runner/config.toml
+sed -i '1s/^/listen_address = "127.0.0.1:8093"\n/' /etc/gitlab-runner/config.toml
 
 echo "Starting gitlab-runner"
 systemctl enable --now gitlab-runner
