@@ -64,7 +64,7 @@ if (curl --silent http://169.254.169.254/latest/meta-data/autoscaling/target-lif
 fi
 EOF
 
-echo "Make the AWS Target Group script executable."
+echo "Make the ASG deregister."
 chmod 754 /usr/local/bin/aws_deregister.sh
 
 echo "Schedule the deregister script every minute."
