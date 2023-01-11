@@ -51,10 +51,14 @@ cat << EOF >> /usr/local/bin/aws_deregister.sh
 
 # If an instance is terminated, unregister the GitLab runner.
 if (curl --silent http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state | grep Terminated) ; then
-  # Send a signal to stop accepting new pipeline jobs.
-  killall --signal SIGQUIT gitlab-runner
-  # Wait 15 minutes to allow jobs to finish.
-  sleep 900
+  # Tell the gitlab-runner to stop accepting new jobs.
+  pkill -SIGQUIT gitlab-runner
+  # Wait until there are 0 jobs, or 14 minutes.
+  retry_count=0
+  until [ "\$(curl --silent http://localhost:8093/metrics | awk '/^gitlab_runner_jobs/ {print $NF}')" -eq 0 ] || [ $retry_count -eq 84 ]; do
+    sleep 10
+    retry_count=$((retry_count+1))
+  done
   # Remove the runner from GitLab.
   gitlab-runner unregister --all-runners
 fi
