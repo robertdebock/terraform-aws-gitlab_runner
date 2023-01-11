@@ -1,6 +1,6 @@
 # Create a security group for the loadbalancer.
 resource "aws_security_group" "public" {
-  description = "Public - Traffic to Vault nodes"
+  description = "Public - Traffic to GitLab Runner nodes"
   name_prefix = "gitlab-runner-public-"
   vpc_id      = aws_vpc.default.id
   lifecycle {

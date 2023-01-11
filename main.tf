@@ -1,4 +1,4 @@
-# Find amis for the Vault instances.
+# Find amis for the instances.
 data "aws_ami" "default" {
   most_recent = true
   owners      = ["amazon"]
