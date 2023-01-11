@@ -104,6 +104,6 @@ resource "aws_autoscaling_lifecycle_hook" "default" {
   name                   = "gitlab_runner_unregister"
   autoscaling_group_name = aws_autoscaling_group.default.name
   default_result         = "CONTINUE"
-  heartbeat_timeout      = 90
+  heartbeat_timeout      = 900
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }
