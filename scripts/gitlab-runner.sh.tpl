@@ -16,7 +16,7 @@ echo "Placing docker volume cleanup script"
 cat << EOF >> /etc/cron.hourly/docker-prune
 #!/bin/sh
 # Remove unused volumes to make diskspace available.
-docker volume prune --force
+docker volume prune --force > /dev/null 2>&1
 EOF
 chmod 755 /etc/cron.hourly/docker-prune
 
