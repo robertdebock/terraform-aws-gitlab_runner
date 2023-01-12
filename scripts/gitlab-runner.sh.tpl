@@ -45,7 +45,14 @@ sed -i '1s/^/listen_address = "127.0.0.1:8093"\n/' /etc/gitlab-runner/config.tom
 echo "Starting gitlab-runner"
 systemctl enable --now gitlab-runner
 
-echo "Prepareing GitLab Runner unregister script"
+echo "Checking if metrics are available."
+until curl --silent http://localhost:8093/metrics > /dev/null 2>&1 ; do
+  echo "Metrics are not available, restarting gitlab-runner."
+  systemctl restart gitlab-runner
+  sleep 10
+done
+
+echo "Preparing GitLab Runner unregister script."
 cat << EOF >> /usr/local/bin/aws_deregister.sh
 #!/bin/sh
 
