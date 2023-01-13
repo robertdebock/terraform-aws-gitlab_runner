@@ -24,7 +24,7 @@ echo "Instaling gitlab-runner."
 rpm -i "https://gitlab-runner-downloads.s3.amazonaws.com/latest/rpm/gitlab-runner_amd64.rpm"
 
 echo "Get information of instance."
-my_instance_id="$(curl http://169.254.169.254/latest/meta-data/instance-id)"
+my_instance_id="$(curl --silent http://169.254.169.254/latest/meta-data/instance-id)"
 
 echo "Registering gitlab-runner."
 gitlab-runner register --non-interactive \
