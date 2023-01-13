@@ -45,6 +45,10 @@ resource "aws_launch_template" "default" {
   }))
   lifecycle {
     create_before_destroy = true
+    precondition {
+      condition     = var.gitlab_runner_extra_disk_size * 50 >= var.gitlab_runner_extra_disk_iops
+      error_message = "The maximum ratio of the disk size and iops is 50. Please specify a larger disk or a lower iops value."
+    }
   }
 }
 
