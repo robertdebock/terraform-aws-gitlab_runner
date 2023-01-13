@@ -26,3 +26,23 @@ variable "gitlab_runner_url" {
     error_message = "Please specify a URL starting with \"http://\" or \"https://\"."
   }
 }
+
+variable "gitlab_runner_extra_disk_size" {
+  default     = 64
+  description = "The size in GB of the disk to attach."
+  type        = number
+  validation {
+    condition     = var.gitlab_runner_extra_disk_size > 8
+    error_message = "Please specify a disksize of 8 (GB) or more."
+  }
+}
+
+variable "gitlab_runner_extra_disk_iops" {
+  default     = 1600
+  description = "The number of iops for the extra disk."
+  type        = number
+  validation {
+    condition     = var.gitlab_runner_extra_disk_iops > 400
+    error_message = "Please specify an amout of iops of 400 or more."
+  }
+}
