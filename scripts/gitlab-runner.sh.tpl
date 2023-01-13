@@ -40,17 +40,9 @@ gitlab-runner register --non-interactive \
 
 echo "Configuring gitlab-runner."
 sed -i "s/concurrent = .*/concurrent = ${gitlab_runner_concurrency}/" /etc/gitlab-runner/config.toml
-sed -i '1s/^/listen_address = "127.0.0.1:8093"\n/' /etc/gitlab-runner/config.toml
 
 echo "Starting gitlab-runner."
 systemctl enable --now gitlab-runner
-
-echo "Checking if metrics are available."
-until curl --silent http://localhost:8093/metrics > /dev/null 2>&1 ; do
-  echo "Metrics are not available, restarting gitlab-runner."
-  systemctl restart gitlab-runner
-  sleep 10
-done
 
 echo "Preparing GitLab Runner unregister script."
 cat << EOF >> /usr/local/bin/aws_deregister.sh
@@ -60,10 +52,10 @@ cat << EOF >> /usr/local/bin/aws_deregister.sh
 if (curl --silent http://169.254.169.254/latest/meta-data/autoscaling/target-lifecycle-state | grep Terminated > /dev/null 2>&1) ; then
   # Tell the gitlab-runner to stop accepting new jobs.
   pkill -SIGQUIT gitlab-runner
-  # Wait until there are 0 jobs, or 14 minutes.
+  # Wait until there are 0 jobs, or 10 minutes.
   retry_count=0
-  until [ "\$(curl --silent http://localhost:8093/metrics | awk '/^gitlab_runner_jobs/ {print $NF}')" -eq 0 ] || [ $retry_count -eq 84 ]; do
-    sleep 10
+  until ! pgrep gitlab-runner > /dev/null 2>&1 || [ "\$retry_count" -eq 10 ] ; do
+    sleep 60
     retry_count=$((retry_count+1))
   done
   # Remove the runner from GitLab.
