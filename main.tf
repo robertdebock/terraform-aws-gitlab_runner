@@ -14,10 +14,10 @@ resource "aws_launch_template" "default" {
   block_device_mappings {
     device_name           = "/dev/sda1"
     ebs {
-      volume_size           = 64
+      volume_size           = var.gitlab_runner_extra_disk_size
       delete_on_termination = true
       volume_type           = "io2"
-      iops                  = 1600
+      iops                  = var.gitlab_runner_extra_disk_iops
     }
   }
   instance_requirements {
