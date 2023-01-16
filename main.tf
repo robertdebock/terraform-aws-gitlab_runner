@@ -107,7 +107,7 @@ resource "aws_autoscaling_schedule" "up" {
   scheduled_action_name  = "up"
   desired_capacity       = 1
   max_size               = 16
-  recurrence             = "30 8 * * 1-5"
+  recurrence             = "30 8 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }
@@ -117,7 +117,7 @@ resource "aws_autoscaling_schedule" "down" {
   scheduled_action_name  = "down"
   desired_capacity       = 0
   max_size               = 16
-  recurrence             = "0 17 * * 1-5"
+  recurrence             = "0 17 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }
