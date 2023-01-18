@@ -17,15 +17,15 @@ resource "aws_launch_template" "default" {
       volume_size           = var.gitlab_runner_extra_disk_size
       delete_on_termination = true
       volume_type           = "io2"
-      iops                  = var.gitlab_runner_extra_disk_iops
+      iops                  = local.iops
     }
   }
   instance_requirements {
     memory_mib {
-      min = 1024
+      min = local.memory
     }
     vcpu_count {
-      min = 2
+      min = local.cpu
     }
     cpu_manufacturers    = ["intel"]
     instance_generations = ["current"]
@@ -41,12 +41,13 @@ resource "aws_launch_template" "default" {
     {
       gitlab_runner_url                = var.gitlab_runner_url
       gitlab_runner_registration_token = var.gitlab_runner_registration_token
-      gitlab_runner_concurrency        = var.gitlab_runner_concurrency
+      gitlab_runner_concurrency        = local.concurrency
+      gitlab_runner_cooldown_time      = var.gitlab_runner_cooldown_time
   }))
   lifecycle {
     create_before_destroy = true
     precondition {
-      condition     = var.gitlab_runner_extra_disk_size * 50 >= var.gitlab_runner_extra_disk_iops
+      condition     = var.gitlab_runner_extra_disk_size * 50 >= local.iops
       error_message = "The maximum ratio of the disk size and iops is 50. Please specify a larger disk or a lower iops value."
     }
   }
@@ -73,10 +74,10 @@ resource "aws_autoscaling_group" "default" {
       override {
         instance_requirements {
           memory_mib {
-            min = 1024
+            min = local.memory
           }
           vcpu_count {
-            min = 2
+            min = local.cpu
           }
         }
       }
@@ -105,8 +106,7 @@ resource "aws_autoscaling_group" "default" {
 # Create one gitlab runner in the morning.
 resource "aws_autoscaling_schedule" "up" {
   scheduled_action_name  = "up"
-  desired_capacity       = 1
-  max_size               = 16
+  min_size               = 1
   recurrence             = "30 8 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
@@ -115,19 +115,17 @@ resource "aws_autoscaling_schedule" "up" {
 # Create zero gitlab runners in the afternoon.
 resource "aws_autoscaling_schedule" "down" {
   scheduled_action_name  = "down"
-  desired_capacity       = 0
-  max_size               = 16
-  recurrence             = "0 17 * * MON-FRI"
+  min_size               = 0
+  recurrence             = "0 0 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }
-
 
 # Let instance wait a bit before removing. This allows gitlab-runner to unregister.
 resource "aws_autoscaling_lifecycle_hook" "default" {
   name                   = "gitlab_runner_unregister"
   autoscaling_group_name = aws_autoscaling_group.default.name
   default_result         = "CONTINUE"
-  heartbeat_timeout      = 900
+  heartbeat_timeout      = var.gitlab_runner_cooldown_time
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }

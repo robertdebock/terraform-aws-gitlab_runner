@@ -1,13 +1,3 @@
-variable "gitlab_runner_concurrency" {
-  default     = 2
-  description = "The amount of jobs to run in parallel."
-  type        = number
-  validation {
-    condition     = var.gitlab_runner_concurrency > 0
-    error_message = "Please use a positive integer."
-  }
-}
-
 variable "gitlab_runner_registration_token" {
   description = "The registration token for the GitLab runner."
   type        = string
@@ -37,12 +27,22 @@ variable "gitlab_runner_extra_disk_size" {
   }
 }
 
-variable "gitlab_runner_extra_disk_iops" {
-  default     = 1600
-  description = "The number of iops for the extra disk."
+variable "gitlab_runner_cooldown_time" {
+  default     = 1800
+  description = "The amount of time in seconds after which the runner will be stopped and removed."
   type        = number
   validation {
-    condition     = var.gitlab_runner_extra_disk_iops > 400
-    error_message = "Please specify an amout of iops of 400 or more."
+    condition     = var.gitlab_runner_cooldown_time > 180
+    error_message = "Please specify a minimum of 180 seconds."
+  }
+}
+
+variable "gitlab_runner_size" {
+  default     = "small"
+  description = "The size of the GitLab runner to start. This variable influences CPU, memory and job concurency."
+  type        = string
+  validation {
+    condition     = contains(["small", "medium", "large"], var.gitlab_runner_size)
+    error_message = "Please select on of \"small\", \"medium\" or \"large\".s"
   }
 }
