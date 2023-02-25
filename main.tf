@@ -20,15 +20,6 @@ resource "aws_launch_template" "default" {
       iops                  = local.iops
     }
   }
-  /* instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price              = local.max_price
-      spot_instance_type     = "one-time"
-      block_duration_minutes = 60
-    }
-  } */
-
   instance_requirements {
     memory_mib {
       min = local.memory
