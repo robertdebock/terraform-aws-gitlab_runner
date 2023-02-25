@@ -20,6 +20,15 @@ resource "aws_launch_template" "default" {
       iops                  = local.iops
     }
   }
+  /* instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price              = local.max_price
+      spot_instance_type     = "one-time"
+      block_duration_minutes = 60
+    }
+  } */
+
   instance_requirements {
     memory_mib {
       min = local.memory
@@ -30,14 +39,14 @@ resource "aws_launch_template" "default" {
     cpu_manufacturers    = ["intel"]
     instance_generations = ["current"]
   }
-  key_name               = aws_key_pair.default.key_name
+  key_name    = aws_key_pair.default.key_name
   name_prefix = "gitlab-runner-"
   network_interfaces {
     associate_public_ip_address = true
     security_groups = [aws_security_group.public.id]
   }
   update_default_version = true
-  user_data = base64encode(templatefile("${path.module}/scripts/gitlab-runner.sh.tpl",
+  user_data              = base64encode(templatefile("${path.module}/scripts/gitlab-runner.sh.tpl",
     {
       gitlab_runner_url                = var.gitlab_runner_url
       gitlab_runner_registration_token = var.gitlab_runner_registration_token
@@ -66,6 +75,12 @@ resource "aws_autoscaling_group" "default" {
   max_size           = 16
   health_check_type  = "EC2"
   mixed_instances_policy {
+    instances_distribution {
+      on_demand_allocation_strategy = "lowest-price"
+      on_demand_base_capacity       = 0
+      on_demand_percentage_above_base_capacity = 0
+      spot_allocation_strategy = "capacity-optimized"
+    }
     launch_template {
       launch_template_specification {
         launch_template_id = aws_launch_template.default.id
@@ -107,7 +122,9 @@ resource "aws_autoscaling_group" "default" {
 resource "aws_autoscaling_schedule" "up" {
   scheduled_action_name  = "up"
   min_size               = 1
-  recurrence             = "30 8 * * MON-FRI"
+  max_size               = -1
+  desired_capacity       = -1
+  recurrence             = "30 7 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }
@@ -116,7 +133,9 @@ resource "aws_autoscaling_schedule" "up" {
 resource "aws_autoscaling_schedule" "down" {
   scheduled_action_name  = "down"
   min_size               = 0
-  recurrence             = "0 0 * * MON-FRI"
+  max_size               = -1
+  desired_capacity       = -1
+  recurrence             = "0 * * * *"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }

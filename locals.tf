@@ -26,4 +26,11 @@ locals {
     large  = 16
   }
   concurrency = local.size_concurrency_map[var.gitlab_runner_size]
+
+  size_spot_max_price_map = {
+    small  = 0.4
+    medium = 0.8
+    large  = 1.6
+  }
+  max_price = local.size_spot_max_price_map[var.gitlab_runner_size]
 }
