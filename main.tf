@@ -110,15 +110,27 @@ resource "aws_autoscaling_group" "default" {
 }
 
 # Create one gitlab runner in the morning.
-resource "aws_autoscaling_schedule" "up" {
-  scheduled_action_name  = "up"
+resource "aws_autoscaling_schedule" "up_morning" {
+  scheduled_action_name  = "up-morning"
   min_size               = 1
   max_size               = -1
   desired_capacity       = -1
-  recurrence             = "30 7 * * MON-FRI"
+  recurrence             = "30 8 * * MON-FRI"
   time_zone              = "Europe/Amsterdam"
   autoscaling_group_name = aws_autoscaling_group.default.name
 }
+
+# Create one gitlab runner in the afternoon.
+resource "aws_autoscaling_schedule" "up_afternoon" {
+  scheduled_action_name  = "up-afternoon"
+  min_size               = 1
+  max_size               = -1
+  desired_capacity       = -1
+  recurrence             = "0 15 * * MON-FRI"
+  time_zone              = "Europe/Amsterdam"
+  autoscaling_group_name = aws_autoscaling_group.default.name
+}
+
 
 # Create zero gitlab runners in the afternoon.
 resource "aws_autoscaling_schedule" "down" {
