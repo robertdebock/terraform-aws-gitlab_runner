@@ -13,7 +13,7 @@ yum -y install docker
 systemctl enable --now docker
 
 echo "Placing docker volume cleanup script."
-cat << EOF >> /etc/cron.hourly/docker-prune
+cat << 'EOF' >> /etc/cron.hourly/docker-prune
 #!/bin/sh
 # Remove unused volumes to make diskspace available.
 docker volume prune --force > /dev/null 2>&1
@@ -45,7 +45,7 @@ echo "Starting gitlab-runner."
 systemctl enable --now gitlab-runner
 
 echo "Writing the GitLab Runner unregister script."
-cat << EOF >> /usr/local/bin/aws_deregister.sh
+cat << 'EOF' >> /usr/local/bin/aws_deregister.sh
 #!/bin/sh
 
 # Check if we are already running
